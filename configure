@@ -1,0 +1,58 @@
+#!/bin/sh
+
+root="`pwd`"
+dirs="hax err"
+
+# option defaults
+link="dynamic"
+build="debug"
+
+# parse options
+while [ "$#" -gt 0 ] ; do
+  :
+done
+
+# print option information
+cat <<EOF
+Configure tool for building <Insert Project Name Here>
+.
+Note: This performs a "common case" build. For greater control of the build
+process, you should manually 'configure' and 'make' the each subdirectory
+individually.
+.
+Build options
+.
+Path       $root
+Link Type  $link
+Build      $build
+EOF
+
+# configure flags
+flags=""
+test "$link" = "static" && flags="$flags --static"
+test "$link" = "dynamic" && flags="$flags --rpath"
+test "$build" = "debug" && flags="$flags --debug"
+
+# run all configures
+for dir in $dirs ; do
+  cd $dir
+  ./configure --prefix="$root" $flags || exit $?
+  cd ..
+done
+
+# build Makefile
+cat <<EOF > Makefile
+all: Makefile
+	for dir in $dirs ; do \$(MAKE) install -C \$\$dir ; done
+
+run: all
+	bin/err
+
+clean:
+	for dir in $dirs ; do \$(MAKE) clean -C \$\$dir ; done
+
+Makefile: configure
+	./configure
+EOF
+
+exit 0

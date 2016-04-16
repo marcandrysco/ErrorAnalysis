@@ -16,6 +16,8 @@ setconf()
   c_src "src/real/arith.c"
   c_src "src/real/expr.c"
   c_src "src/real/func.c"
+
+  c_src "src/marc.c"
 }
 ## end configuration options ##
 
